@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>XDXDXD</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Общие стили */
+:root{
+  --accent:#7c5cff;
+  --glass-bg: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.06);
+  --text: #ddd;
+}
+html,body{
+  height:100%;
+  margin:0;
+  background:#000;
+  color:var(--text);
+  font-family: 'Fixedsys Excelsior 3.01', 'Courier New', monospace;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow:hidden;
+}
+
+/* Центрирование контейнера */
+.app {
+  position:relative;
+  min-height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px;
+  box-sizing:border-box;
+  z-index:2;
+}
+
+/* Полупрозрачный прямоугольник */
+.box {
+  width:min(600px, 85vw);
+  height:auto;
+  min-height:240px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border:1px solid var(--glass-border);
+  backdrop-filter: blur(8px) saturate(1.05);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  border-radius:24px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.7), 0 1px 0 rgba(124,92,255,0.04) inset;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px;
+  box-sizing:border-box;
+}
+
+/* левая часть — круг + никнейм */
+.box-left {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  flex-shrink:0;
+}
+.box-circle {
+  width:100px;
+  height:100px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.15);
+  background-size:cover;
+  background-position:center;
+  cursor:default; /* отключён клик для аватара */
+  transition:opacity 0.2s;
+}
+.box-circle:hover {
+  opacity:0.8;
+}
+.box-nickname {
+  font-size:18px;
+  font-weight:600;
+  color:#fff;
+  transition:background 0.2s;
+}
+
+/* разделитель */
+.box-divider {
+  display:none; /* удаляем вертикальную полоску */
+}
+
+/* правая часть — ссылки внизу */
+.box-right {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  overflow:visible;
+}
+
+/* новая структура: 3 колонки */
+.box-right-content {
+  display:none; /* скрываем старую сетку */
+}
+
+/* левая колонка — ссылки в столбик */
+.box-links-col {
+  display:none;
+}
+
+/* информация теперь сверху */
+.box-info {
+  display:none; /* скрываем информационные блоки */
+}
+
+/* links row — горизонтальные ссылки внизу */
+.links {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;   /* центрируем по ширине */
+  gap:12px;                 /* чуть больше места между элементами */
+  flex-wrap:nowrap;         /* запрещаем перенос, оставляем на одной линии */
+  overflow-x:hidden;          /* если не помещается — можно прокрутить */
+  width:100%;
+  margin-top:30px;
+}
+.links a, .links button {
+  color:var(--text);
+  text-decoration:none;
+  font-weight:600;
+  font-size:13px;
+  background:transparent;
+  border:0;
+  padding:6px 8px;
+  cursor:pointer;
+  color:#fff;
+  text-shadow:0 0 8px rgba(255,255,255,0.3), 0 0 16px rgba(255,255,255,0.1);
+  transition:text-shadow 0.3s;
+}
+.links a:hover, .links button:hover {
+  text-shadow:0 0 12px rgba(255,255,255,0.5), 0 0 24px rgba(255,255,255,0.2);
+}
+
+/* надпись внизу о проигрывании или навигации */
+.hint {
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:12px;
+  color:rgba(255,255,255,0.4);
+  user-select:none;
+  pointer-events:none;
+  transition:opacity 0.3s;
+  z-index:1;
+}
+.hint.hidden {
+  opacity:0;
+  display:none;
+}
+
+@media (max-width:768px){
+  .box { flex-direction:column; gap:20px; padding:24px; }
+  .box-left { flex-direction:row; gap:12px; }
+  .box-circle { width:70px; height:70px; border-radius:12px; }
+  .box-divider { display:none; }
+}
+
+/* мобильная версия для очень маленьких экранов */
+ @media (max-width:480px){
+   .box {
+     width:min(100%, 100vw);
+     min-height:200px;
+     padding:24px 20px;
+     margin-top:30px;
+   }
+   .box-left { gap:12px; }
+   .box-circle { width:60px; height:60px; border-radius:10px; }
+   .box-nickname { font-size:16px; }
+   .links {
+     gap:12px 8px;
+     margin-top:24px;
+     font-size:12px;
+     flex-wrap:wrap;
+     max-width:150px;
+     justify-content:center;
+   }
+   .links a, .links button { 
+     padding:4px 6px;
+     font-size:11px;
+     text-shadow:0 0 6px rgba(255,255,255,0.2), 0 0 12px rgba(255,255,255,0.08);
+     flex:0 0 calc(50% - 6px);
+     text-align:center;
+     margin:0;
+   }
+   .links .sep { 
+     display:none;
+   }
+   .hint { font-size:10px; bottom:16px; }
+ }
+
+ /* надпись под прямоугольником */
+ .nav-hint {
+   position:absolute;
+   bottom:-35px;
+   left:50%;
+   transform:translateX(-50%);
+   font-size:12px;
+   color:rgba(255,255,255,0.4);
+   user-select:none;
+   pointer-events:none;
+   white-space:nowrap;
+ }
+</style>
+</head>
+<body>
+<canvas id="rain" style="position:fixed;inset:0;z-index:0;display:block;"></canvas>
+
+<!-- скрытый аудио плеер для музыки -->
+<audio id="bgMusic" style="display:none;" autoplay muted loop preload="auto">
+  <source src="pismo.mp3" type="audio/mpeg">
+</audio>
+
+<div class="app">
+   <div class="box" style="z-index:1;">
+     <!-- центр: аватарка и ник -->
+     <div class="box-left">
+       <div class="box-circle" id="avatarBox"></div>
+       <div class="box-nickname">target.xo</div>
+     </div>
+     
+     <!-- разделитель (скрыт) -->
+     <div class="box-divider"></div>
+     
+     <!-- ссылки внизу -->
+     <div class="box-right">
+       <!-- ссылки горизонтально -->
+       <div class="links" id="linksRow">
+         <a class="link" href="https://soundcloud.com/targetxd" target="_blank" rel="noopener">soundcloud</a>
+         <span class="sep">|</span>
+         <a class="link" href="https://steamcommunity.com/id/melanchoIicangel/" target="_blank" rel="noopener">steam</a>
+         <span class="sep">|</span>
+         <a class="link" href="https://www.tiktok.com/@seenthis444ngel" target="_blank" rel="noopener">tiktok</a>
+         <span class="sep">|</span>
+         <a class="link" href="https://www.pinterest.com/imsickwithyou/" target="_blank" rel="noopener">pinterest</a>
+       </div>
+       <!-- надпись под прямоугольником -->
+       <div class="nav-hint" id="hint">click to play audio</div>
+     </div>
+   </div>
+ </div>
+
+ <script>
+/* обработчики загрузки изображений */
+const avatarBox = document.getElementById('avatarBox');
+const hint = document.getElementById('hint');
+
+ /* автозапуск музыки с autoplay, включение звука при готовности */
+ window.addEventListener('load', () => {
+    const bgMusic = document.getElementById('bgMusic');
+    if(bgMusic){
+      bgMusic.volume = 0.5;
+      console.log('✓ Музыка инициализирована');
+      console.log('Источник аудио:', bgMusic.querySelector('source')?.src);
+      console.log('Статус готовности:', bgMusic.readyState);
+      
+      // Диагностика ошибок загрузки
+      bgMusic.addEventListener('error', (e) => {
+        console.error('❌ Ошибка загрузки аудио:', bgMusic.error?.message);
+      });
+      
+      bgMusic.addEventListener('canplay', () => {
+        console.log('✓ Аудио готово к проигрыванию');
+      });
+      
+      // Включить звук при первом клике пользователя
+      document.addEventListener('click', () => {
+        // Инициализировать AudioContext (требует клик)
+        try{
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          if(audioContext.state === 'suspended'){
+            audioContext.resume().then(() => {
+              console.log('✓ AudioContext активирован');
+            });
+          }
+        }catch(e){ /* игнорируем */ }
+        
+        // Включить звук
+        bgMusic.muted = false;
+        console.log('✓ Звук включен');
+        // Изменить надпись на "click to navigate"
+        hint.textContent = 'click to navigate';
+        bgMusic.play().catch(err => {
+          console.log('Ошибка при клике:', err);
+        });
+      }, { once: true });
+     }
+   });
+
+/* загружаем аватарку по умолчанию при открытии страницы */
+/* ЗАМЕНИТЕ 'avatar.png' на имя вашего файла в той же папке */
+window.addEventListener('load', () => {
+  const avatarUrl = 'avatar.png';
+  const img = new Image();
+  img.onload = () => {
+    avatarBox.style.backgroundImage = `url('${avatarUrl}')`;
+    console.log('✓ Аватарка загружена успешно');
+  };
+  img.onerror = () => {
+    console.error('✗ Ошибка загрузки avatar.png. Проверьте:');
+    console.error('1. Файл находится в папке: c:\\Users\\Маргулан\\Desktop\\ыаыаыа\\');
+    console.error('2. Имя файла точно: avatar.png');
+    console.error('3. Формат поддерживается (jpg, png, gif)');
+  };
+  img.src = avatarUrl;
+});
+
+  /* Rain (маленькие мерцающие кубики) */
+  (function(){
+    const canvas = document.getElementById('rain');
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width = innerWidth;
+    let H = canvas.height = innerHeight;
+    window.addEventListener('resize', ()=>{ W=canvas.width=innerWidth; H=canvas.height=innerHeight; init(); });
+
+    const particles = [];
+    const count = Math.round((W*H)/60000) * 80 + 60; // адаптивно
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+    function init(){
+      particles.length = 0;
+      for(let i=0;i<count;i++){
+        particles.push({
+          x: rand(0,W),
+          y: rand(-H, H),
+          size: Math.random()*4 + 1.2,
+          speed: Math.random()*0.8 + 0.2,
+          alpha: Math.random()*0.6 + 0.2,
+          twinkle: Math.random()*0.02 + 0.003
+        });
+      }
+    }
+    init();
+
+    function step(){
+      ctx.clearRect(0,0,W,H);
+      for(const p of particles){
+        p.y += p.speed;
+        p.x += Math.sin(p.y*0.01 + p.x*0.01) * 0.2;
+        p.alpha += Math.sin(Date.now()*p.twinkle/200) * p.twinkle;
+        p.alpha = Math.max(0.05, Math.min(0.9, p.alpha));
+        if(p.y > H + 20){ p.y = -10; p.x = rand(0,W); }
+
+        // белые мерцающие кубики
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = '#ffffff';
+        const s = p.size;
+        ctx.fillRect(p.x - s/2, p.y - s/2, s, s);
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  })();
+</script>
+</body>
+</html>
