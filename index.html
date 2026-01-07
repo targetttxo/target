@@ -67,11 +67,12 @@ html,body{
   width:100px;
   height:100px;
   border-radius:16px;
-  background:rgba(255,255,255,0.15);
+  background:transparent;
   background-size:cover;
   background-position:center;
   cursor:default; /* отключён клик для аватара */
   transition:opacity 0.2s;
+  border:none;
 }
 .box-circle:hover {
   opacity:0.8;
@@ -326,7 +327,7 @@ window.addEventListener('load', () => {
     window.addEventListener('resize', ()=>{ W=canvas.width=innerWidth; H=canvas.height=innerHeight; init(); });
 
     const particles = [];
-    const count = Math.round((W*H)/60000) * 80 + 60; // адаптивно
+    const count = Math.round((W*H)/150000) * 80 + 30; // уменьшил количество
     function rand(min,max){ return Math.random()*(max-min)+min; }
     function init(){
       particles.length = 0;
@@ -334,9 +335,9 @@ window.addEventListener('load', () => {
         particles.push({
           x: rand(0,W),
           y: rand(-H, H),
-          size: Math.random()*4 + 1.2,
-          speed: Math.random()*0.8 + 0.2,
-          alpha: Math.random()*0.6 + 0.2,
+          size: Math.random()*3 + 0.8,
+          speed: Math.random()*0.3 + 0.1, // медленнее падают
+          alpha: Math.random()*0.3 + 0.1, // более прозрачные
           twinkle: Math.random()*0.02 + 0.003
         });
       }
@@ -347,16 +348,17 @@ window.addEventListener('load', () => {
       ctx.clearRect(0,0,W,H);
       for(const p of particles){
         p.y += p.speed;
-        p.x += Math.sin(p.y*0.01 + p.x*0.01) * 0.2;
         p.alpha += Math.sin(Date.now()*p.twinkle/200) * p.twinkle;
-        p.alpha = Math.max(0.05, Math.min(0.9, p.alpha));
+        p.alpha = Math.max(0.05, Math.min(0.5, p.alpha)); // потолок прозрачности снизил
         if(p.y > H + 20){ p.y = -10; p.x = rand(0,W); }
 
-        // белые мерцающие кубики
+        // белые мерцающие КРУГИ вместо кубиков
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = '#ffffff';
         const s = p.size;
-        ctx.fillRect(p.x - s/2, p.y - s/2, s, s);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, s, 0, Math.PI * 2);
+        ctx.fill();
       }
       ctx.globalAlpha = 1;
       requestAnimationFrame(step);
